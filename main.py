@@ -1,6 +1,7 @@
 import discord
 import os
 from keep_alive import keep_alive
+from MO import discordMO
 
 intents = discord.Intents.default()
 intents.message_content = True
@@ -8,12 +9,15 @@ intents.voice_states = True
 
 # クライアントの生成
 client = discord.Client(intents=intents)
-
+mo: discordMO
 
 # discordと接続した時に呼ばれる
 @client.event
 async def on_ready():
+  global mo
+  mo = discordMO(client)
   print(f'We have logged in as {client.user}')
+
 
 
 # メッセージを受信した時に呼ばれる
@@ -25,6 +29,8 @@ async def on_message(message):
   # メッセージが"$hello"で始まっていたら"Hello!"と応答
   if message.content.startswith('$hello'):
     await message.channel.send('Hello!1.1.6')
+  
+  await mo(message)
 
 
 @client.event
