@@ -27,7 +27,7 @@ class Battle:
       await self.timeline.show()
       await order[j].order_actions(self.timeline, order[i])
       self.timeline.time_sort()
-      await self.timeline.show()
+      # await self.timeline.show()
       await self.timeline.excute()
       
       winner = self.get_winner()
@@ -58,8 +58,8 @@ class Timeline(list):
     self.ui = ui
 
   def set(self, action: Action, to, by, cost_factor: float=1):
-    by.pre_speed -= int(action.cost*cost_factor)
     self.append(Timeline.Task(action, to, by))
+    by.pre_speed -= int(action.cost*cost_factor)
 
   def time_sort(self):
     def key(task: Timeline.Task):
@@ -74,8 +74,9 @@ class Timeline(list):
 
   async def excute(self):
     for t in self:
-      await self.ui.output(f"{t.to.name} の {t.action.name} が発動!")
-      await t.action(t.to, t.by)
+      if t.by.is_alive():
+        await self.ui.output(f"[SP:{t.time}] {t.by.name} の {t.action.name} が発動!")
+        await t.action(t.to, t.by)
       
 
 

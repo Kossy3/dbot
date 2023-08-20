@@ -56,7 +56,7 @@ class Charactor(ABC):
     self.heal_hp()
 
   def get_max_sp(self):
-    max_speed = int(self.base_speed/10 + 50)
+    max_speed = int(self.base_speed/20 + 10)
     return max_speed
   
   def heal_sp(self, n: int=10000):
@@ -69,12 +69,14 @@ class Charactor(ABC):
   
   def heal_hp(self, n: int=10000):
     # {(種族値×2＋個体値＋努力値/4)×Lv/100}＋10＋Lv
-    max_hp = int(self.base_hp*2*self.lv/100 + 50 + self.lv*4)
+    max_hp = int(self.base_hp*2*self.lv/100 + 50 + self.lv)
     self.hp = min(max_hp, self.hp+n)
   
   async def damage(self, damage):
     self.hp = max(0, self.hp - damage)
-    await self.ui.output(f"{self.name}に{damage}ダメージ！ (残りHP:{self.hp})")
+    await self.ui.output(f"{self.name}に{damage}ダメージ! (残りHP:{self.hp})")
+    if not self.is_alive():
+      await self.ui.output(f"{self.name}は気絶した!")
 
   def is_alive(self):
     return self.hp != 0
@@ -155,13 +157,13 @@ class Player(Charactor):
 
 class Enemy(Charactor):
   async def select_action(self, timeline, players, enemies):
+    cost_factor = len(players)
     action_slot = random.choice([self.attack_slot])
-    valid_actions = action_slot.get(self.pre_speed)
+    valid_actions = action_slot.get(self.pre_speed/cost_factor)
     if len(valid_actions) == 0:
       return True
     action = random.choice(valid_actions)
     target = random.choice(enemies)
-    cost_factor = len(players)
     timeline.set(action, target, self, cost_factor=cost_factor)
     return False
 
