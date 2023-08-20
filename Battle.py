@@ -57,8 +57,8 @@ class Timeline(list):
   def __init__(self, ui: UI):
     self.ui = ui
 
-  def set(self, action: Action, to, by, cost_factor: float=1):
-    by.pre_speed -= int(action.cost*cost_factor)
+  def set(self, action: Action, to, by):
+    by.pre_speed -= action.cost
     self.append(Timeline.Task(action, to, by))
 
   def time_sort(self):
@@ -74,7 +74,6 @@ class Timeline(list):
 
   async def excute(self):
     for t in self:
-      await self.ui.output(f"{t.to.name} の {t.action.name} が発動!")
       await t.action(t.to, t.by)
       
 

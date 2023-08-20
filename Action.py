@@ -15,12 +15,12 @@ class Action:
 
 
 class Attack(Action):
-  def calc_damage(self, to, by, factor:int):
-    return int((by.atk/to.dfn + to.lv/2)*factor)
+    def calc_damage(self, to, by, factor:int):
+        return int((by.atk/to.dfn + to.lv/2)*factor)
     
 class Magic(Action):
   def calc_damage(self, to, by, factor:int):
-    return int((by.sp_atk/to.sp_dfn + to.lv/2)*factor)
+        return int((by.sp_atk/to.sp_dfn + to.lv/2)*factor)
 
 class Item(Action):
    def __init__(self, func: types.FunctionType, name: str, text: str):

@@ -33,7 +33,7 @@ class Team(list[Charactor]):
 
   async def order_actions(self, timeline, enemies):
     for c in self:
-      await c.order_actions(timeline, self, enemies)
+      await c.order_actions(timeline, enemies)
 
   async def show(self):
     await self.ui.output(f"ーー【{self.name}一覧】ーー")

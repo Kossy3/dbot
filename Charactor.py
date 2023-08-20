@@ -42,7 +42,6 @@ class Charactor(ABC):
     self.base_sp_dfn = get_gauss()
     self.base_speed = get_gauss()
     self.attack_slot.append(Attacks.actions[0])
-    self.attack_slot.append(Attacks.actions[1])
     
   def set_battle_status(self):
     # [{(種族値×2＋個体値＋努力値/4)×Lv/100}＋5]×性格補正(1.1,1.0,0.9)
@@ -54,18 +53,16 @@ class Charactor(ABC):
     self.heal_sp()
     self.heal_pre_sp()
     self.heal_hp()
-
-  def get_max_sp(self):
-    max_speed = int(self.base_speed/10 + 50)
-    return max_speed
   
   def heal_sp(self, n: int=10000):
-    # 成長しない 10 - 30程度 平均16.5
-    self.speed = min(self.get_max_sp(), self.speed+n)
+    # 成長しない 50 - 150程度
+    max_speed = int(self.base_speed/10 + 50)
+    self.speed = min(max_speed, self.speed+n)
 
   def heal_pre_sp(self, n: int=10000):
     # 成長しない 50 - 150程度
-    self.pre_speed = min(self.get_max_sp(), self.pre_speed+n)
+    max_speed = int(self.base_speed/10 + 50)
+    self.pre_speed = min(max_speed, self.pre_speed+n)
   
   def heal_hp(self, n: int=10000):
     # {(種族値×2＋個体値＋努力値/4)×Lv/100}＋10＋Lv
@@ -79,17 +76,17 @@ class Charactor(ABC):
   def is_alive(self):
     return self.hp != 0
 
-  async def order_actions(self, timeline, players, enemies):
+  async def order_actions(self, timeline, enemies):
     ok = False
     while not ok:
-      ok = await self.select_action(timeline, players, enemies) 
+      ok = await self.select_action(timeline, enemies) 
 
   @abstractmethod
   async def select_action(self, timeline, enemies) -> bool:
       ...
   
 class Player(Charactor):
-  async def select_action(self, timeline, players, enemies):
+  async def select_action(self, timeline, enemies):
       select_action_cmd = Commands()
 
       @select_action_cmd.command(help="攻撃")
@@ -151,18 +148,17 @@ class Player(Charactor):
 
       timeline.set(action, target, self)
       return False
-  
+
 
 class Enemy(Charactor):
-  async def select_action(self, timeline, players, enemies):
+  async def select_action(self, timeline, enemies):
     action_slot = random.choice([self.attack_slot])
     valid_actions = action_slot.get(self.pre_speed)
     if len(valid_actions) == 0:
       return True
     action = random.choice(valid_actions)
     target = random.choice(enemies)
-    cost_factor = len(players)
-    timeline.set(action, target, self, cost_factor=cost_factor)
+    timeline.set(action, target, self)
     return False
 
 
