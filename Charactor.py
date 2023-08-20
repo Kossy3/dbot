@@ -41,7 +41,7 @@ class Charactor(ABC):
     self.base_sp_atk = get_gauss()
     self.base_sp_dfn = get_gauss()
     self.base_speed = get_gauss()
-    self.attack_slot.append(Attacks.attacks[0])
+    self.attack_slot.append(Attacks.actions[0])
     
   def set_battle_status(self):
     # [{(種族値×2＋個体値＋努力値/4)×Lv/100}＋5]×性格補正(1.1,1.0,0.9)

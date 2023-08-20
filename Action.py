@@ -1,6 +1,7 @@
 import types
 from abc import ABC, abstractmethod
 from UI import *
+from UI import types
 
 class Action:
   def __init__(self, func: types.FunctionType, name: str, cost: int, text: str):
@@ -21,19 +22,32 @@ class Magic(Action):
   def calc_damage(self, to, by, factor:int):
         return int((by.sp_atk/to.sp_dfn + to.lv/2)*factor)
 
+class Item(Action):
+   def __init__(self, func: types.FunctionType, name: str, text: str):
+      super().__init__(func, name, 0, text)
 
-class Attacks(list):
+class Actions:
   
-  attacks :list[Attack] = []
+  actions :list[Action] = []
 
   def create(name: str, cost: int, text: str=""):
     def deco(func: types.FunctionType):
         func_args = func.__code__.co_varnames[:func.__code__.co_argcount]
         async def new_func(**kwargs):
             await func(**{k:kwargs[k] for k in func_args})
-        Attacks.attacks.append(Attack(new_func, name, cost, text))
+        Actions.actions.append(Attack(new_func, name, cost, text))
         return new_func
     return deco
+  
+class Attacks(Actions):
+  ...
+
+class Magics(Actions):
+  ...
+   
+class Items(Actions):
+  ...
+
 
 
 class ActionSlot(list):
@@ -64,10 +78,3 @@ class ActionSlot(list):
         await self.ui.output(f"{removed_action.name} を破棄しました。")
       self.append(action)
       await self.ui.output(f"{action.name} を追加しました。")
-
-  
-##　以下スキル実装 #####################
-
-
-  
-
