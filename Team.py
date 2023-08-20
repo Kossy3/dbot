@@ -1,4 +1,4 @@
-from charactor import *
+from Charactor import *
 import random
 
 class Team(list[Charactor]):

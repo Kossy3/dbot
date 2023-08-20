@@ -1,6 +1,6 @@
 import random
 from UI import *
-from action import *
+from Action import *
 
 class Charactor(ABC):
   def __init__(self, ui: UI, name, random=False, 

@@ -1,6 +1,7 @@
 from Entry import *
 from Battle import *
 from Commands import *
+import Skill
 import asyncio
 
 class RPG:

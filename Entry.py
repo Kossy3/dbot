@@ -1,6 +1,6 @@
 import random
 from UI import *
-from charactor import *
+from Charactor import *
 
 class Entry:
   def __init__(self, ui :UI):

@@ -1,7 +1,6 @@
 import types
 from abc import ABC, abstractmethod
 from UI import *
-#from charactor import Charactor
 
 class Action:
   def __init__(self, func: types.FunctionType, name: str, cost: int, text: str):
@@ -17,6 +16,10 @@ class Action:
 class Attack(Action):
     def calc_damage(self, to, by, factor:int):
         return int((by.atk/to.dfn + to.lv/2)*factor)
+    
+class Magic(Action):
+  def calc_damage(self, to, by, factor:int):
+        return int((by.sp_atk/to.sp_dfn + to.lv/2)*factor)
 
 
 class Attacks(list):
@@ -63,30 +66,8 @@ class ActionSlot(list):
       await self.ui.output(f"{action.name} を追加しました。")
 
   
-@Attacks.create("とっしん", 10, "敵にとっしんし、ダメージを与える")
-async def test(self: Attack, to, by):
-  damage = self.calc_damage(to, by, 10)
-  await to.damage(damage)
+##　以下スキル実装 #####################
+
+
   
 
-class Magic:
-  def __init__(self):
-    ...
-'''
-magic = Magic()
-
-@magic.main(name="ファイアーボール", cost=20, 
-text="""敵に100ダメージ""")
-def fireball(to, by):
-  to.damage(100, by)
-
-
-def main():
-  output = Output()
-  player = Charactor(output, "")
-  Battle()
-
-
-if __name__ == "__main__":
-  main()
-'''

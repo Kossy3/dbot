@@ -1,4 +1,4 @@
-from charactor import *
+from Charactor import *
 from Team import *
 import random
 
