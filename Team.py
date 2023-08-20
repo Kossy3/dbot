@@ -44,3 +44,8 @@ class Team(list[Charactor]):
   def battle_init(self):
     for c in self:
       c.set_battle_status()
+
+  def remove_dead(self):
+    for c in self:
+      if not c.is_alive():
+        self.remove(c)

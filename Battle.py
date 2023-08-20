@@ -22,6 +22,7 @@ class Battle:
     while not winner:
       self.timeline.clear()
       [t.full_sp() for t in order]
+      [t.remove_dead() for t in order]
       await order[i].order_actions(self.timeline, order[j])
       self.timeline.time_sort()
       await self.timeline.show()
