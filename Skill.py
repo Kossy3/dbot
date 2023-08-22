@@ -10,3 +10,8 @@ async def test(self: Attack, to: Charactor, by: Charactor):
 async def test(self: Attack, to: Charactor, by: Charactor):
   damage = self.calc_damage(to, by, 50)
   await to.damage(damage)
+
+@Attacks.create("ちょっぷ", 3, "小ダメージを与える")
+async def test(self: Attack, to: Charactor, by: Charactor):
+  damage = self.calc_damage(to, by, 15)
+  await to.damage(damage)
