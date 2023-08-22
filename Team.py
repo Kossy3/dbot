@@ -1,12 +1,14 @@
 from Charactor import *
 import random
+from test_enemy_names import data as enemy_names
 
 class Team(list[Charactor]):
-  def __init__(self,ui: UI, name: str, *args):
+  def __init__(self,ui: UI, name: str, *args: Charactor):
     self.name = name
     self.ui = ui
     for arg in args:
       self.append(arg)
+      arg.team = self
 
   async def our_turn(self):
     for c in self:
@@ -19,11 +21,13 @@ class Team(list[Charactor]):
     else:
       return False
     
-  def random_enemies(self):
+  def random_enemies(self, lv):
     rnd = random.randrange(1, 6)
-    rnd_name = ["FairyChair", "naminami", "勇ましきエルフ", "Arusia", "yuno812", "tempurature", "trick", "セイナ", "sabakann", "ヤリ木三太郎"]
+    rnd_name = enemy_names
     for i in range(rnd):
-      self.append(Enemy(self.ui, random.choice(rnd_name, )))
+      e = Enemy(self.ui, f"{random.choice(rnd_name, )['label'].replace('+', '')}Lv.{lv}")
+      e.lv = int(lv)
+      self.append(e)
       self[-1].set_random()
   
   def full_sp(self):

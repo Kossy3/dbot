@@ -16,7 +16,7 @@ class Action:
 
 class Attack(Action):
   def calc_damage(self, to, by, factor:int):
-    return int((by.atk/to.dfn + to.lv/2)*factor)
+    return int((by.atk/to.dfn*50 + to.lv*2/5+ 2)*factor/50 + 2)
     
 class Magic(Action):
   def calc_damage(self, to, by, factor:int):

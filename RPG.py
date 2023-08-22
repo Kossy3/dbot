@@ -19,8 +19,14 @@ class RPG:
   async def wait_commands(self):
     cmd = Commands()
     @cmd.command(help="HPを表示")
-    async def show_hp():
-      await self.ui.output(f"hp: {self.player.hp}")
+    async def show():
+      self.player.set_battle_status()
+      await self.player.show()
+
+    @cmd.command(help="レベル変更")
+    async def set_lv(lv: int):
+      self.player.lv = lv
+      await self.ui.output(f"lv: {self.player.lv}")
 
     @cmd.regix_command(regix="aa")
     async def greet(message):
@@ -28,7 +34,7 @@ class RPG:
 
     @cmd.command(help="戦闘シーンのテストを開始します")
     async def test(message):
-      battle = Battle(self.ui, Team(self.ui, self.player.name, self.player), random_enemies=True)
+      battle = Battle(self.ui, Team(self.ui, self.player.name, self.player), random_enemies=self.player.lv)
       await battle()
     
     while self.login:

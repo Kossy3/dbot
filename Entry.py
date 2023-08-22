@@ -14,14 +14,10 @@ class Entry:
     
     # ステータス配分がここであるかもしれない
     player = Player(self.ui, message.content, random=True)
-    player.set_battle_status()
+
     # HP特盛
-    player.base_hp *= 5
-    await self.ui.output("基礎HPを5倍にします")
-    await self.ui.output(
-f"""{message.content} さんを登録
-HP:{player.hp}({player.base_hp}) SP:{player.speed}({player.base_speed})
-Atk:{player.atk}({player.base_atk}) Dfn:{player.dfn}({player.base_dfn})
-Sp.Atk:{player.sp_atk}({player.base_sp_atk}) Sp.Dfn:{player.sp_dfn}({player.base_sp_dfn})
-※()は基礎値""")
+    player.set_battle_status()
+    await self.ui.output("HPを5倍にします")
+    await self.ui.output(f"""{message.content} さんを登録 """)
+    await player.show()
     return player
