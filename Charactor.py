@@ -80,9 +80,9 @@ class Charactor(ABC):
   async def damage(self, damage):
     prev_is_alive = self.is_alive()
     self.hp = max(0, self.hp - damage)
-    await self.ui.output(f"        {self.name}に{damage}ダメージ! (残りHP:{self.hp})")
+    await self.ui.output(f"        {self.name} に {damage}ダメージ! (残りHP:{self.hp})")
     if self.is_alive() != prev_is_alive:
-      await self.ui.output(f"        {self.name}は気絶した!")
+      await self.ui.output(f"        {self.name} は気絶した!")
 
   async def show(self):
     await self.ui.output(

@@ -52,9 +52,11 @@ class discordUI(UI):
 
   async def wait_input(self, timeout) -> str:
     if len(self.texts) > 0:
-      texts = [f"```python\n{t}\n```" for t in texts]
-      self.texts.insert(0, f"<@{self.user_id}>")
-      await self.channel.send("\n".join(self.texts))
+      texts = self.texts
+      texts[0] = f"```python\n{texts[0]}"
+      texts[-1] = f"{texts[-1]}```"
+      texts.insert(0, f"<@{self.user_id}>")
+      await self.channel.send("\n".join(texts))
       self.texts.clear()
 
     def check(message: discord.Message):
