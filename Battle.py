@@ -74,16 +74,19 @@ class Timeline(list):
       await self.ui.output(f"[SP:{i.time}] {i.action.name} to {i.to.name} by {i.by.name}")
     await self.ui.output(f"ーーーーーーーーーー")
 
+  def is_sousai(self, time:int):
+    teams = set()
+    for v in self:
+      if v.time == time and v.by.is_alive():
+        teams.add(v.by.team.name)
+    return len(teams) >= 2
+
   async def excute(self):
     sousai_time = 10000
-    for i, v in enumerate(self):
+    for v in self:
       if sousai_time == v.time:
         continue
-      if (i+1 < len(self) 
-          and self[i+1].by.team != v.by.team 
-          and self[i+1].time == v.time
-          and self[i+1].by.is_alive()
-          and v.by.is_alive()):
+      if self.is_sousai(v.time):
         sousai_time = v.time
         await self.ui.output(f"[SP:{v.time}] ＞＞相殺＜＜")
       elif v.by.is_alive():

@@ -25,10 +25,10 @@ class Team(list[Charactor]):
     rnd = random.randrange(1, 6)
     rnd_name = enemy_names
     for i in range(rnd):
-      e = Enemy(self.ui, f"{random.choice(rnd_name, )['label'].replace('+', '')}Lv.{lv}")
+      e = Enemy(self.ui, f"{random.choice(rnd_name, )['label'].replace('+', '')}Lv.{lv}", random=True)
       e.lv = int(lv)
+      e.team = self
       self.append(e)
-      self[-1].set_random()
   
   def full_sp(self):
     for c in self:
