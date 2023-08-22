@@ -29,8 +29,8 @@ class Commands:
 
     def command(self, name=[], help=""):
         def deco(func: types.FunctionType):
-            func_args = func.__code__.co_varnames[:func.__code__.co_argcount]
             sig = signature(func)
+            func_args = sig.parameters
 
             # 引数をアノテーションの型に自動変換
             def convert_args(key, value):
@@ -51,9 +51,17 @@ class Commands:
                 if len([k for k in func_args if k not in sp_kwargs]) > len(args):
                     raise Commands.MissingArgument
                 iter_args = iter(args)
-                new_kwargs = {
-                    k: sp_kwargs[k] if k in sp_kwargs else convert_args(k, next(iter_args)) for k in func_args 
-                }
+                new_kwargs = {}
+                for k in func_args:
+                    if k in sp_kwargs:
+                        new_kwargs[k] = sp_kwargs[k]
+                    elif sig.parameters[k].kind == Parameter.VAR_POSITIONAL:
+                        new_args = list(new_kwargs.values())
+                        for arg in iter_args:
+                            new_args.append(convert_args(k, arg))
+                        return await func(*new_args)
+                    else:
+                        new_kwargs[k] = convert_args(k, next(iter_args))
                 return await func(**new_kwargs)
                 
             if not name:

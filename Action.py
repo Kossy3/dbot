@@ -4,11 +4,12 @@ from UI import *
 from UI import types
 
 class Action:
-  def __init__(self, func: types.FunctionType, name: str, cost: int, text: str):
+  def __init__(self, func: types.FunctionType, name: str, cost: int, text: str, select_to: int=1):
       self.func: types.FunctionType = func
       self.name = name
       self.text = text
       self.cost = cost
+      self.select_to = select_to
   
   async def __call__(self, to, by):
       await self.func(self=self, to=to, by=by)
@@ -23,30 +24,38 @@ class Magic(Action):
     return int((by.sp_atk/to.sp_dfn + to.lv/2)*factor)
 
 class Item(Action):
-   def __init__(self, func: types.FunctionType, name: str, text: str):
-      super().__init__(func, name, 0, text)
+  def use(self, by):
+    by.item_slot.remove(self)
 
-class Actions:
+class Actions(ABC):
+  @abstractmethod
+  def create(*args, **kwargs):
+    ...
   
+class Attacks(Actions):
   actions :list[Action] = []
-
-  def create(name: str, cost: int, text: str=""):
+  def create(name: str, cost: int, text: str="", select_to: int=1):
     def deco(func: types.FunctionType):
         func_args = func.__code__.co_varnames[:func.__code__.co_argcount]
         async def new_func(**kwargs):
             await func(**{k:kwargs[k] for k in func_args})
-        Actions.actions.append(Attack(new_func, name, cost, text))
+        Attacks.actions.append(Attack(new_func, name, cost, text, select_to))
         return new_func
     return deco
-  
-class Attacks(Actions):
-  ...
 
 class Magics(Actions):
   ...
    
 class Items(Actions):
-  ...
+  actions :list[Action] = []
+  def create(name: str, cost: int, text: str="", select_to: int=0):
+    def deco(func: types.FunctionType):
+        func_args = func.__code__.co_varnames[:func.__code__.co_argcount]
+        async def new_func(**kwargs):
+            await func(**{k:kwargs[k] for k in func_args})
+        Items.actions.append(Item(new_func, name, cost, text, select_to))
+        return new_func
+    return deco
 
 
 

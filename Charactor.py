@@ -42,9 +42,12 @@ class Charactor(ABC):
     self.base_sp_atk = get_gauss()
     self.base_sp_dfn = get_gauss()
     self.base_speed = get_gauss()
-    actions = random.sample(Attacks.actions, min(len(Attacks.actions), 6))
-    for i in actions:
+    attacks = random.sample(Attacks.actions, min(len(Attacks.actions), 6))
+    for i in attacks:
       self.attack_slot.append(i)
+    items = random.sample(Items.actions, min(len(Items.actions), 6))
+    for i in items:
+      self.item_slot.append(i)
     
   def set_battle_status(self):
     # [{(種族値×2＋個体値＋努力値/4)×Lv/100}＋5]×性格補正(1.1,1.0,0.9)
@@ -149,21 +152,29 @@ class Player(Charactor):
           await self.ui.output("SPが足りません")
           return False
       
+
       select_target_cmd = Commands()
 
       @select_target_cmd.command(help="対象の番号")
-      async def to(no: int):
-        if len(enemies) >= no > 0:
-          await self.ui.output(f"対象 No.{no}：{enemies[no-1].name}")
-          return enemies[no-1]
-        await self.ui.output(f"対象 No.{no}：存在しません")
-        return None
-      
-      await self.ui.output("対象を選択してください。(to int)")
-      await enemies.show()
+      async def to(*numbers: int):
+        target = []
+        for no in numbers[:action.select_to]:
+          if len(enemies) >= no > 0:
+            await self.ui.output(f"対象 No.{no}：{enemies[no-1].name}")
+            target.append(enemies[no-1])
+          else:
+            await self.ui.output(f"対象 No.{no}：存在しません")
+            return None
+        return target
+
       target = None
-      while not target:
-        target = await self.ui.wait_commands(timeout=60, commands=select_target_cmd)
+      if action.select_to: 
+        await self.ui.output("対象を選択してください。(to int ...)")
+        await enemies.show()
+        while not target:
+          target = await self.ui.wait_commands(timeout=60, commands=select_target_cmd)
+      else:
+        target = enemies
 
       timeline.set(action, target, self)
       return False
@@ -180,7 +191,10 @@ class Enemy(Charactor):
     if len(valid_actions) == 0:
       return True
     action = random.choice(valid_actions)
-    target = random.choice(enemies)
+    if action.select_to:
+      target = random.sample(enemies, action.select_to)
+    else:
+      target = enemies
     timeline.set(action, target, self, cost_factor=cost_factor)
     return False
 

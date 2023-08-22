@@ -49,7 +49,7 @@ class Battle:
 
 class Timeline(list):
   class Task:
-    def __init__(self, action: Action, to: Charactor, by: Charactor):
+    def __init__(self, action: Action, to: list[Charactor], by: Charactor):
       self.action = action
       self.to = to
       self.by = by
@@ -59,7 +59,7 @@ class Timeline(list):
   def __init__(self, ui: UI):
     self.ui = ui
 
-  def set(self, action: Action, to, by, cost_factor: float=1):
+  def set(self, action: Action, to: list[Charactor], by: Charactor, cost_factor: float=1):
     self.append(Timeline.Task(action, to, by))
     by.pre_speed -= int(action.cost*cost_factor)
 
@@ -71,7 +71,7 @@ class Timeline(list):
   async def show(self):
     await self.ui.output(f"ーータイムラインーー")
     for i in self:
-      await self.ui.output(f"[SP:{i.time}] {i.action.name} to {i.to.name} by {i.by.name}")
+      await self.ui.output(f"[SP:{i.time}] {i.action.name} to {', '.join([v.name for v in i.to])} by {i.by.name}")
     await self.ui.output(f"ーーーーーーーーーー")
 
   def is_sousai(self, time:int):
