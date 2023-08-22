@@ -88,7 +88,7 @@ class Timeline(list):
         continue
       if self.is_sousai(v.time):
         sousai_time = v.time
-        await self.ui.output(f"[SP:{v.time}] ＞＞相殺＜＜")
+        await self.ui.output(f"[SP:{v.time:02}] ＞＞相殺＜＜")
       elif v.by.is_alive():
-        await self.ui.output(f"[SP:{v.time}] {v.by.name} の {v.action.name} が発動!")
+        await self.ui.output(f"[SP:{v.time:02}] {v.by.name} の {v.action.name} が発動!")
         await v.action(v.to, v.by)
