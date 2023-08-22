@@ -23,6 +23,7 @@ class Charactor(ABC):
       self.set_random()
 
     # 戦闘時変数
+    self.team = None
     self.hp = 0
     self.atk = 0
     self.dfn = 0
@@ -46,10 +47,10 @@ class Charactor(ABC):
     
   def set_battle_status(self):
     # [{(種族値×2＋個体値＋努力値/4)×Lv/100}＋5]×性格補正(1.1,1.0,0.9)
-    self.atk = int(self.base_atk*2*self.lv/100 + 25)
-    self.dfn = int(self.base_dfn*2*self.lv/100 + 25)
-    self.sp_atk = int(self.base_sp_atk*2*self.lv/100 + 25)
-    self.sp_dfn = int(self.base_sp_dfn*2*self.lv/100 + 25)
+    self.atk = int(self.base_atk*2*self.lv/100 + 5)
+    self.dfn = int(self.base_dfn*2*self.lv/100 + 5)
+    self.sp_atk = int(self.base_sp_atk*2*self.lv/100 + 5)
+    self.sp_dfn = int(self.base_sp_dfn*2*self.lv/100 + 5)
     # 変動するもの
     self.heal_sp()
     self.heal_pre_sp()
@@ -58,6 +59,11 @@ class Charactor(ABC):
   def get_max_sp(self):
     max_speed = int(self.base_speed/20 + 10)
     return max_speed
+  
+  def get_max_hp(self):
+    # {(種族値×2＋個体値＋努力値/4)×Lv/100}＋10＋Lv
+    max_hp = int(self.base_hp*2*self.lv/100 + 10 + self.lv)
+    return max_hp
   
   def heal_sp(self, n: int=10000):
     # 成長しない 10 - 30程度 平均16.5
@@ -68,15 +74,22 @@ class Charactor(ABC):
     self.pre_speed = min(self.get_max_sp(), self.pre_speed+n)
   
   def heal_hp(self, n: int=10000):
-    # {(種族値×2＋個体値＋努力値/4)×Lv/100}＋10＋Lv
-    max_hp = int(self.base_hp*2*self.lv/100 + 50 + self.lv)
-    self.hp = min(max_hp, self.hp+n)
+    self.hp = min(self.get_max_hp(), self.hp+n)
   
   async def damage(self, damage):
+    prev_is_alive = self.is_alive()
     self.hp = max(0, self.hp - damage)
     await self.ui.output(f"{self.name}に{damage}ダメージ! (残りHP:{self.hp})")
-    if not self.is_alive():
+    if self.is_alive() != prev_is_alive:
       await self.ui.output(f"{self.name}は気絶した!")
+
+  async def show(self):
+    await self.ui.output(
+f"""<{self.name}> Lv.{self.lv}
+HP:{self.hp}({self.base_hp}) SP:{self.speed}({self.base_speed})
+Atk:{self.atk}({self.base_atk}) Dfn:{self.dfn}({self.base_dfn})
+Sp.Atk:{self.sp_atk}({self.base_sp_atk}) Sp.Dfn:{self.sp_dfn}({self.base_sp_dfn})
+※()は基礎値""")
 
   def is_alive(self):
     return self.hp != 0
@@ -153,6 +166,9 @@ class Player(Charactor):
 
       timeline.set(action, target, self)
       return False
+  
+  def heal_hp(self, n: int = 10000):
+    self.hp = min(self.get_max_hp() * 5, self.hp+n)
   
 
 class Enemy(Charactor):

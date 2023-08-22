@@ -3,14 +3,14 @@ from Team import *
 import random
 
 class Battle:
-  def __init__(self, ui :UI, players :Team, enemies :Team=None, random_enemies=False):
+  def __init__(self, ui :UI, players :Team, enemies :Team=None, random_enemies: int=0):
     self.players = players
     self.enemies = enemies
     self.ui = ui
     self.timeline = Timeline(ui)
     if random_enemies:
       self.enemies = Team(self.ui, "Enemy")
-      self.enemies.random_enemies()
+      self.enemies.random_enemies(lv=random_enemies)
 
   async def __call__(self):
     order: list[Team] = [self.players, self.enemies]
@@ -54,6 +54,7 @@ class Timeline(list):
       self.to = to
       self.by = by
       self.time = int(by.pre_speed)
+      self.sousai = False
 
   def __init__(self, ui: UI):
     self.ui = ui
@@ -74,7 +75,17 @@ class Timeline(list):
     await self.ui.output(f"ーーーーーーーーーー")
 
   async def excute(self):
-    for t in self:
-      if t.by.is_alive():
-        await self.ui.output(f"[SP:{t.time}] {t.by.name} の {t.action.name} が発動!")
-        await t.action(t.to, t.by)
+    sousai_time = 10000
+    for i, v in enumerate(self):
+      if sousai_time == v.time:
+        continue
+      if (i+1 < len(self) 
+          and self[i+1].by.team != v.by.team 
+          and self[i+1].time == v.time
+          and self[i+1].by.is_alive()
+          and v.by.is_alive()):
+        sousai_time = v.time
+        await self.ui.output(f"[SP:{v.time}] ＞＞相殺＜＜")
+      elif v.by.is_alive():
+        await self.ui.output(f"[SP:{v.time}] {v.by.name} の {v.action.name} が発動!")
+        await v.action(v.to, v.by)
