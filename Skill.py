@@ -27,4 +27,4 @@ async def test(self: Item, by: Charactor):
   self.use(by)
   before_hp = by.hp
   by.heal_hp(int(by.get_max_hp()*0.3))
-  await by.ui.output(f"        {by.name} に{by.hp - before_hp}の回復!")
+  await by.ui.output(f"        {by.name} に{by.hp - before_hp} の回復!")
